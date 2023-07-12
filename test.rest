@@ -1,0 +1,7 @@
+###
+GET http://192.168.18.93:4000/api/listMenu
+###
+POST http://192.168.18.27:9001/api/method/frappe.desk.reportview.get
+
+###
+GET http://192.168.18.93:4000/api/getBukti/43086714-4ef4-45b4-97af-4815e3949fd9

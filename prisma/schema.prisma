@@ -1,0 +1,30 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DB_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model meja {
+    id        String @id
+    nomorMeja String
+
+    createdAt DateTime @default(now()) @updatedAt
+    updatedAt DateTime @default(now()) @updatedAt
+    order     order[]
+}
+
+model order {
+    id              String   @id @default(uuid())
+    namaPembeli     String
+    catatanPembeli  String?
+    jenisPembayaran String
+    meja            meja?    @relation(fields: [mejaId], references: [id])
+    mejaId          String?
+    pesanan         Json
+    isDone          Int      @default(0)
+    createdAt       DateTime @default(now()) @updatedAt
+    updatedAt       DateTime @default(now()) @updatedAt
+}
