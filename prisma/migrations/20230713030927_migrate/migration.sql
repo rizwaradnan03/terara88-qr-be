@@ -15,6 +15,7 @@ CREATE TABLE "order" (
     "catatanPembeli" TEXT,
     "jenisPembayaran" TEXT NOT NULL,
     "mejaId" TEXT,
+    "totalBayar" TEXT,
     "pesanan" JSONB NOT NULL,
     "isDone" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
