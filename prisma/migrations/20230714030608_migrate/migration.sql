@@ -13,7 +13,7 @@ CREATE TABLE "order" (
     "id" TEXT NOT NULL,
     "namaPembeli" TEXT NOT NULL,
     "catatanPembeli" TEXT,
-    "jenisPembayaran" TEXT NOT NULL,
+    "jenisPembayaran" TEXT,
     "mejaId" TEXT,
     "totalBayar" TEXT,
     "pesanan" JSONB NOT NULL,

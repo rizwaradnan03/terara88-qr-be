@@ -5,7 +5,9 @@ const {
     ajukanPesanan,
     getBukti,
     listOrder,
-    updateKonfirmasi
+    updateKonfirmasi,
+    customerVerifikasiPembayaran,
+    confirmSelesai,
 } = require('../controllers/BaseApiController')
 
 const router = express.Router()
@@ -16,5 +18,7 @@ router.get('/getBukti/:id', getBukti)
 router.post('/ajukanPesanan', ajukanPesanan)
 router.get('/listOrder', listOrder)
 router.patch('/updateKonfirmasi/:id', updateKonfirmasi)
+router.get('/customerVerifikasiPembayaran/:id', customerVerifikasiPembayaran)
+router.patch('/confirmSelesai/:id', confirmSelesai)
 
 module.exports = router

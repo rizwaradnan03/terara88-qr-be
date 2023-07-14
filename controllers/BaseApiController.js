@@ -5,8 +5,12 @@ const prisma = new PrismaClient()
 const BaseResponse = require('./BaseResponseController');
 
 const baseUrl = process.env.ERP_URL
-const headers = {
-    Authorization: `token ${process.env.API_KEY}:${process.env.API_SECRET}`,
+const headerSuper = {
+    Authorization: `token ${process.env.API_KEY_SUPER}:${process.env.API_SECRET_SUPER}`,
+};
+const headerCashier = {
+    Accept: 'application/json',
+    Authorization: `token ${process.env.API_KEY_CASHIER}:${process.env.API_SECRET_CASHIER}`,
 };
 
 const listMenu = async (req, res) => {
@@ -22,7 +26,7 @@ const listMenu = async (req, res) => {
                 pos_profile: 'Default',
             },
             {
-                headers,
+                headers: headerSuper,
             }
         );
 
@@ -54,8 +58,8 @@ const listMenu = async (req, res) => {
 
 const listOrder = async (req, res) => {
     try {
-        const dataKonfirmasi = await prisma.$queryRawUnsafe(`SELECT "order"."id" as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "order"."jenisPembayaran" as "jenisPembayaran", "meja"."nomorMeja" as meja, "order"."totalBayar" as "totalBayar", "order".pesanan as pesanan, "order"."isDone" as "isDone" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order"."isDone" = 0 ORDER BY "order"."createdAt"`)
-        const dataPending = await prisma.$queryRawUnsafe(`SELECT "order"."id" as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "order"."jenisPembayaran" as "jenisPembayaran", "meja"."nomorMeja" as meja, "order"."totalBayar" as "totalBayar", "order".pesanan as pesanan, "order"."isDone" as "isDone" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order"."isDone" = 1 ORDER BY "order"."createdAt"`)
+        const dataKonfirmasi = await prisma.$queryRawUnsafe(`SELECT "order"."id" as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "meja"."nomorMeja" as meja, "order"."totalBayar" as "totalBayar", "order".pesanan as pesanan, "order"."isDone" as "isDone" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order"."isDone" = 0 ORDER BY "order"."createdAt"`)
+        const dataPending = await prisma.$queryRawUnsafe(`SELECT "order"."id" as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "meja"."nomorMeja" as meja, "order"."totalBayar" as "totalBayar", "order".pesanan as pesanan, "order"."isDone" as "isDone" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order"."isDone" = 1 ORDER BY "order"."createdAt"`)
 
         const datas = {
             'konfirmasi': dataKonfirmasi,
@@ -89,12 +93,12 @@ const getMeja = async (req, res) => {
 
 const ajukanPesanan = async (req, res) => {
     try {
-        const { namaPembeli, catatanPembeli, jenisPembayaran, mejaId, totalBayar, pesanan } = req.body
+        const { namaPembeli, catatanPembeli, mejaId, totalBayar, pesanan } = req.body
+        // console.log(req.body)
         const datas = await prisma.order.create({
             data: {
                 namaPembeli: namaPembeli,
                 catatanPembeli: catatanPembeli,
-                jenisPembayaran: jenisPembayaran,
                 mejaId: mejaId,
                 totalBayar: totalBayar,
                 pesanan: pesanan,
@@ -115,7 +119,7 @@ const ajukanPesanan = async (req, res) => {
 const getBukti = async (req, res) => {
     try {
         const { id } = req.params
-        const hitApi = await prisma.$queryRawUnsafe(`SELECT "order".id as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "order"."jenisPembayaran" as "jenisPembayaran", "meja"."nomorMeja" as "nomorMeja", "order".pesanan as pesanan, "order"."isDone" as "isDone" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order".id = '${id}'`)
+        const hitApi = await prisma.$queryRawUnsafe(`SELECT "order".id as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "meja"."nomorMeja" as "nomorMeja", "order".pesanan as pesanan, "order"."isDone" as "isDone" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order".id = '${id}'`)
 
         const hitResult = hitApi[0]
 
@@ -134,19 +138,114 @@ const getBukti = async (req, res) => {
     }
 }
 
-const updateKonfirmasi = async (req,res) => {
+const updateKonfirmasi = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
+        const {jenisPembayaran} = req.body
         const datas = await prisma.order.update({
             where: {
                 id: id
             },
             data: {
-                isDone: 1
+                isDone: 1,
+                jenisPembayaran: jenisPembayaran
             }
         })
 
-        const response = BaseResponse(200,'Success Update',datas)
+        const response = BaseResponse(200, 'Success Update', datas)
+        res.status(200).json(response)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const customerVerifikasiPembayaran = async (req, res) => {
+    try {
+        const { id } = req.params
+        const hitApi = await prisma.$queryRawUnsafe(`SELECT "order".id as id, "order"."namaPembeli" as "namaPembeli", "order"."catatanPembeli" as "catatanPembeli", "meja"."nomorMeja" as "nomorMeja", "order".pesanan as pesanan, "order"."isDone" as "isDone", "order"."totalBayar" as "totalBayar" FROM "order" INNER JOIN "meja" ON "meja".id = "order"."mejaId" WHERE "order".id = '${id}'`)
+
+        const hitResult = hitApi[0]
+
+        if (!hitResult || hitResult.length === 0) {
+            return res.status(200).json(BaseResponse(400, 'Not Found', []))
+        }
+        const datas = {
+            'pembeli': hitResult,
+            'listItem': hitResult.pesanan,
+        }
+        const response = BaseResponse(200, 'Data Found', datas)
+        res.status(200).json(response)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const confirmSelesai = async (req, res) => {
+    try {
+
+        const { id } = req.params
+        const {jenisPembayaran} = req.body
+        await prisma.order.update({
+            where: {
+                id: id
+            },
+            data: {
+                isDone: 2,
+                jenisPembayaran: jenisPembayaran
+            }
+        })
+
+        const searchCustomer = await prisma.order.findUnique({
+            where: {
+                id: id
+            }
+        })
+        console.log(searchCustomer.pesanan.length)
+        let dataErp = [];
+        for (let i = 0; i < searchCustomer.pesanan.length; i++) {
+            dataErp.push({
+                'item_code': searchCustomer.pesanan[i].kode,
+                'qty': searchCustomer.pesanan[i].jumlah.toString(),
+                'rate': parseInt(searchCustomer.pesanan[i].harga.replace(',', '')),
+            });
+        }
+
+        const currentDate = new Date();
+        const year = currentDate.getFullYear(); // Tahun saat ini
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Bulan saat ini (dalam format 2 digit)
+        const day = String(currentDate.getDate()).padStart(2, '0'); // Tanggal saat ini (dalam format 2 digit)
+
+        const formattedDate = `${year}-${month}-${day}`;
+
+        const datas = {
+            'doctype': 'POS Invoice',
+            'naming_series': formattedDate.replaceAll('-', '') + '-',
+            'customer': 'Dine In',
+            'posting_date': formattedDate,
+            'company': 'Teras Nusantara 88',
+            'items': dataErp,
+            'payments': [{
+                'mode_of_payment': searchCustomer.jenisPembayaran,
+                'amount': parseInt(searchCustomer.totalBayar),
+                'type': searchCustomer.jenisPembayaran == 'Cash' ? 'Cash' : 'Bank' 
+            }],
+            'status': 'Paid'
+        }
+        
+        const hitApi = axios.post(`${baseUrl}/resource/POS%20Invoice`,{
+            data: datas
+        } ,{
+            headers: headerCashier
+        })
+        
+        // await axios.post(`${baseUrl}/resource/POS%20Invoice/${hitApi.id}`,{
+        //     data: {
+        //         paid: 1
+        //     },
+        //     headers: headerCashier
+        // })
+
+        const response = BaseResponse(200,'Success Create',hitApi)
         res.status(200).json(response)
     } catch (error) {
         console.log(error)
@@ -159,5 +258,7 @@ module.exports = {
     ajukanPesanan,
     getBukti,
     listOrder,
-    updateKonfirmasi
+    updateKonfirmasi,
+    customerVerifikasiPembayaran,
+    confirmSelesai,
 };

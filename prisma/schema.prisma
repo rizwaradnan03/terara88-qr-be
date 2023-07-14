@@ -20,7 +20,7 @@ model order {
     id              String   @id @default(uuid())
     namaPembeli     String
     catatanPembeli  String?
-    jenisPembayaran String
+    jenisPembayaran String?
     meja            meja?    @relation(fields: [mejaId], references: [id])
     mejaId          String?
     totalBayar      String?
