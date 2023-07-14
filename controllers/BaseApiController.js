@@ -19,7 +19,7 @@ const listMenu = async (req, res) => {
             `${baseUrl}/method/erpnext.selling.page.point_of_sale.point_of_sale.get_items`,
             {
                 start: '0',
-                page_length: '40',
+                page_length: '50',
                 price_list: 'Standard Selling',
                 item_group: 'All Item Groups',
                 search_term: '',
