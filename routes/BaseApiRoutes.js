@@ -6,6 +6,7 @@ const {
     getBukti,
     listOrder,
     updateKonfirmasi,
+    updatePengiriman,
     customerVerifikasiPembayaran,
     confirmSelesai,
 } = require('../controllers/BaseApiController')
@@ -18,6 +19,7 @@ router.get('/getBukti/:id', getBukti)
 router.post('/ajukanPesanan', ajukanPesanan)
 router.get('/listOrder', listOrder)
 router.patch('/updateKonfirmasi/:id', updateKonfirmasi)
+router.patch('/updatePengiriman/:id', updatePengiriman)
 router.get('/customerVerifikasiPembayaran/:id', customerVerifikasiPembayaran)
 router.patch('/confirmSelesai/:id', confirmSelesai)
 
