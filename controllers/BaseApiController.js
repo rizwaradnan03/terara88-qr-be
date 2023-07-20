@@ -143,7 +143,7 @@ const getBukti = async (req, res) => {
 const updateKonfirmasi = async (req, res) => {
     try {
         const { id } = req.params
-        const {jenisPembayaran} = req.body
+        const { jenisPembayaran } = req.body
         const datas = await prisma.order.update({
             where: {
                 id: id
@@ -164,7 +164,7 @@ const updateKonfirmasi = async (req, res) => {
 const updatePengiriman = async (req, res) => {
     try {
         const { id } = req.params
-        const {jenisPembayaran} = req.body
+        const { jenisPembayaran } = req.body
         const datas = await prisma.order.update({
             where: {
                 id: id
@@ -207,7 +207,7 @@ const confirmSelesai = async (req, res) => {
     try {
 
         const { id } = req.params
-        const {jenisPembayaran} = req.body
+        const { jenisPembayaran } = req.body
         await prisma.order.update({
             where: {
                 id: id
@@ -250,25 +250,18 @@ const confirmSelesai = async (req, res) => {
             'payments': [{
                 'mode_of_payment': searchCustomer.jenisPembayaran,
                 'amount': parseInt(searchCustomer.totalBayar),
-                'type': searchCustomer.jenisPembayaran == 'Cash' ? 'Cash' : 'Bank' 
+                'type': searchCustomer.jenisPembayaran == 'Cash' ? 'Cash' : 'Bank'
             }],
             'status': 'Paid'
         }
-        
-        const hitApi = axios.post(`${baseUrl}/resource/POS%20Invoice`,{
+
+        await axios.post(`${baseUrl}/resource/POS%20Invoice`, {
             data: datas
-        } ,{
+        }, {
             headers: headerCashier
         })
-        
-        // await axios.post(`${baseUrl}/resource/POS%20Invoice/${hitApi.id}`,{
-        //     data: {
-        //         paid: 1
-        //     },
-        //     headers: headerCashier
-        // })
 
-        const response = BaseResponse(200,'Success Create',hitApi)
+        const response = BaseResponse(200, 'Success Create', 1)
         res.status(200).json(response)
     } catch (error) {
         console.log(error)
