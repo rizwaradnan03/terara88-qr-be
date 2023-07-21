@@ -240,26 +240,26 @@ const confirmSelesai = async (req, res) => {
 
         const formattedDate = `${year}-${month}-${day}`;
 
-        const datas = {
-            'doctype': 'POS Invoice',
-            'naming_series': formattedDate.replaceAll('-', '') + '-',
-            'customer': 'Dine In',
-            'posting_date': formattedDate,
-            'company': 'Teras Nusantara 88',
-            'items': dataErp,
-            'payments': [{
-                'mode_of_payment': searchCustomer.jenisPembayaran,
-                'amount': parseInt(searchCustomer.totalBayar),
-                'type': searchCustomer.jenisPembayaran == 'Cash' ? 'Cash' : 'Bank'
-            }],
-            'status': 'Paid'
-        }
+        // const datas = {
+        //     'doctype': 'POS Invoice',
+        //     'naming_series': formattedDate.replaceAll('-', '') + '-',
+        //     'customer': 'Dine In',
+        //     'posting_date': formattedDate,
+        //     'company': 'Teras Nusantara 88',
+        //     'items': dataErp,
+        //     'payments': [{
+        //         'mode_of_payment': searchCustomer.jenisPembayaran,
+        //         'amount': parseInt(searchCustomer.totalBayar),
+        //         'type': searchCustomer.jenisPembayaran == 'Cash' ? 'Cash' : 'Bank'
+        //     }],
+        //     'status': 'Paid'
+        // }
 
-        await axios.post(`${baseUrl}/resource/POS%20Invoice`, {
-            data: datas
-        }, {
-            headers: headerCashier
-        })
+        // await axios.post(`${baseUrl}/resource/POS%20Invoice`, {
+        //     data: datas
+        // }, {
+        //     headers: headerCashier
+        // })
 
         const response = BaseResponse(200, 'Success Create', 1)
         res.status(200).json(response)
